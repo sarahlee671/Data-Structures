@@ -1,3 +1,5 @@
+from doubly_linked_list import DoublyLinkedList
+
 class LRUCache:
   """
   Our LRUCache class keeps track of the max number of nodes it
@@ -7,7 +9,15 @@ class LRUCache:
   to every node stored in the cache.
   """
   def __init__(self, limit=10):
-    pass
+        #DLL to store the order
+        self.order = DoublyLinkedList()
+        #Dict store key value pairs
+        self.storage = dict()
+        #current size
+        self.size = 0
+        #limit
+        self.limit = limit
+  
 
   """
   Retrieves the value associated with the given key. Also
@@ -17,7 +27,18 @@ class LRUCache:
   key-value pair doesn't exist in the cache. 
   """
   def get(self, key):
-    pass
+    #Pull the value out of the dict using the key
+    if key in self.storage:
+      node = self.storage[key]
+      self.order.move_to_front(node)
+      return node.value[1]
+    else:
+      return None
+    #Update position in the list
+    #Or return None
+
+    
+    
 
   """
   Adds the given key-value pair to the cache. The newly-
@@ -30,4 +51,23 @@ class LRUCache:
   the newly-specified value. 
   """
   def set(self, key, value):
-    pass
+    #If already exists, overwrite value
+    if key in self.storage: 
+      #Update dict
+      node = self.storage[key]
+      node.value = (key, value)
+      #Mark as most recently used - Put in the head of the DLL
+      self.order.move_to_front(node)
+      return
+    #If at max capacity, dump oldest - remove from tail of DLL
+    if self.size == self.limit:
+      #dump the oldest:
+      #remove it from the linked list
+      #remove it from the dictionary
+      del self.storage[self.order.tail.value[0]]
+      self.order.remove_from_tail()
+      self.size -= 1
+    #Add pair to the cache - add to dict and add it nodes/DLL
+    self.order.add_to_head((key, value))
+    self.storage[key] = self.order.head
+    self.size += 1
